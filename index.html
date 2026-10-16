@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halloween Race</title>
+    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #12091f;
+            --panel-bg: rgba(30, 15, 50, 0.85);
+            --orange: #ff7518;
+            --purple: #8a2be2;
+            --neon-green: #39ff14;
+            --gold: #ffd700;
+            --text-light: #f3f4f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Balsamiq Sans', cursive, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 117, 24, 0.15) 0%, transparent 40%),
+                linear-gradient(135deg, #0b0514 0%, #1a0b2e 50%, #0f0518 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            background: var(--panel-bg);
+            border: 3px solid var(--purple);
+            border-radius: 16px;
+            padding: 12px 25px;
+            box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--orange);
+            text-shadow: 2px 2px 0px #000, 0 0 15px rgba(255, 117, 24, 0.6);
+            letter-spacing: 1px;
+        }
+
+        .controls-top {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: #2a1545;
+            color: var(--text-light);
+            border: 2px solid var(--orange);
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 0 #150a22;
+        }
+
+        .btn-icon:hover {
+            background: var(--orange);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #150a22;
+        }
+
+        .btn-icon:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #150a22;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 15px 0;
+            gap: 15px;
+        }
+
+        .track-panel {
+            background: var(--panel-bg);
+            border: 3px solid var(--orange);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .finish-line {
+            position: absolute;
+            top: 10px;
+            bottom: 10px;
+            right: 80px;
+            width: 12px;
+            background: repeating-linear-gradient(
+                0deg,
+                #fff,
+                #fff 15px,
+                #111 15px,
+                #111 30px
+            );
+            border: 2px dashed #ff7518;
+            z-index: 2;
+            opacity: 0.85;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+
+        .lanes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .lane {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 8, 25, 0.6);
+            border: 2px solid rgba(138, 43, 226, 0.4);
+            border-radius: 12px;
+            height: 52px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lane-number {
+            width: 35px;
+            text-align: center;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: bold;
+            border-right: 2px dashed rgba(255, 255, 255, 0.1);
+            margin-right: 10px;
+        }
+
+        .lane-label {
+            width: 110px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-light);
+            text-transform: lowercase;
+            padding-left: 5px;
+            text-shadow: 1px 1px 2px #000;
+            z-index: 3;
+            white-space: nowrap;
+        }
+
+        .racer {
+            position: absolute;
+            left: 145px;
+            display: flex;
+            align-items: center;
+            height: 44px;
+            transition: transform 0.05s linear;
+            will-change: transform;
+            z-index: 4;
+        }
+
+        .racer img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 3px solid var(--purple);
+            border-radius: 16px;
+            padding: 15px 25px;
+            box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #ff7518 0%, #ff4500 100%);
+            color: #fff;
+            border: 3px solid #ffd700;
+            border-radius: 14px;
+            padding: 12px 35px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #8b2500, 0 10px 20px rgba(255, 117, 24, 0.4);
+            transition: all 0.1s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #8b2500, 0 12px 25px rgba(255, 117, 24, 0.6);
+        }
+
+        .btn-start:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #8b2500;
+        }
+
+        .btn-start:disabled {
+            background: #4a3b5c;
+            border-color: #6b5b7c;
+            color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: 0 3px 0 #2b1f38;
+            transform: translateY(3px);
+        }
+
+        .status-display {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-align: center;
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        /* Overlay modal for countdown and winner */
+        .overlay-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 4, 20, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay-banner.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .countdown-number {
+            font-size: 9rem;
+            color: var(--orange);
+            text-shadow: 0 0 40px var(--purple), 4px 4px 0 #000;
+            animation: pulseCount 0.9s infinite alternate;
+        }
+
+        @keyframes pulseCount {
+            0% { transform: scale(0.9); opacity: 0.8; }
+            100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .winner-card {
+            background: linear-gradient(135deg, #2a1045 0%, #150824 100%);
+            border: 4px solid var(--gold);
+            border-radius: 25px;
+            padding: 30px 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.5), inset 0 0 30px rgba(138, 43, 226, 0.5);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .winner-card h2 {
+            font-size: 2.2rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .winner-card img {
+            width: 130px;
+            height: 130px;
+            object-fit: contain;
+            margin: 15px 0;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.8));
+            animation: floatWinner 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatWinner {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-12px); }
+        }
+
+        .winner-name {
+            font-size: 3rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 0 #000, 0 0 25px rgba(255, 215, 0, 0.8);
+            margin-bottom: 25px;
+        }
+
+        .btn-close-overlay {
+            background: var(--orange);
+            color: #fff;
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 10px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #a03500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close-overlay:hover {
+            background: #ff8c3a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #a03500;
+        }
+
+        /* Confetti canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.6rem; }
+            .lane-label { width: 90px; font-size: 0.95rem; }
+            .btn-start { font-size: 1.2rem; padding: 10px 20px; }
+            .status-display { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Halloween Race</h1>
+        <div class="controls-top">
+            <button id="btn-sound" class="btn-icon" title="Toggle Background Music">🔊 Music: Off</button>
+            <button id="btn-fullscreen" class="btn-icon" title="Toggle Fullscreen">⛶ Fullscreen</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="track-panel">
+            <div class="finish-line"></div>
+            <div id="lanes-container" class="lanes-container">
+                <!-- Lanes generated dynamically -->
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <button id="btn-start" class="btn-start">START RACE</button>
+            <div id="status-display" class="status-display">Ready to race!</div>
+        </div>
+    </div>
+
+    <!-- Countdown & Winner Overlay -->
+    <div id="overlay" class="overlay-banner">
+        <div id="countdown-display" class="countdown-number" style="display: none;">3</div>
+        <div id="winner-display" class="winner-card" style="display: none;">
+            <h2>The winner is...</h2>
+            <img id="winner-img" src="" alt="">
+            <div id="winner-name" class="winner-name">GHOST</div>
+            <button id="btn-dismiss" class="btn-close-overlay">Play Again</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        // Character data array
+        const characters = [
+            { name: "mummy", file: "mummy.png" },
+            { name: "ghost", file: "ghost.png" },
+            { name: "pumpkin", file: "pumpkin.png" },
+            { name: "spider", file: "spider.png" },
+            { name: "witch", file: "witch.png" },
+            { name: "vampire", file: "vampire.png" },
+            { name: "bat", file: "bat.png" },
+            { name: "skeleton", file: "skeleton.png" }
+        ];
+
+        let previousWinner = null;
+        let isRacing = false;
+        let animationFrameId = null;
+        let racersState = [];
+
+        // DOM Elements
+        const lanesContainer = document.getElementById('lanes-container');
+        const btnStart = document.getElementById('btn-start');
+        const statusDisplay = document.getElementById('status-display');
+        const btnSound = document.getElementById('btn-sound');
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        const overlay = document.getElementById('overlay');
+        const countdownDisplay = document.getElementById('countdown-display');
+        const winnerDisplay = document.getElementById('winner-display');
+        const winnerImg = document.getElementById('winner-img');
+        const winnerNameElem = document.getElementById('winner-name');
+        const btnDismiss = document.getElementById('btn-dismiss');
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctxConfetti = confettiCanvas.getContext('2d');
+
+        // Audio and Web Audio API synthesizer
+        let audioCtx = null;
+        let musicInterval = null;
+        let isMusicPlaying = false;
+        let synthGain = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(freq, duration, type = 'sine', volMultiplier = 1.0) {
+            if (!audioCtx || !isMusicPlaying) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                // Max volume is 100%, play at 10% volume (0.1 base, scaled by volMultiplier)
+                const baseVolume = 0.1 * volMultiplier;
+                gain.gain.setValueAtTime(baseVolume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Spooky background music loop (played at 10% volume maximum)
+        function startBackgroundMusic() {
+            initAudio();
+            isMusicPlaying = true;
+            btnSound.textContent = "🔊 Music: On";
+
+            // Simple eerie spooky progression in minor key
+            const notes = [130.81, 155.56, 146.83, 116.54, 98.00, 116.54, 130.81, 155.56];
+            let step = 0;
+
+            if (musicInterval) clearInterval(musicInterval);
+            musicInterval = setInterval(() => {
+                if (!isMusicPlaying) return;
+                playTone(notes[step], 0.6, 'triangle', 0.5);
+                step = (step + 1) % notes.length;
+            }, 600);
+        }
+
+        function stopBackgroundMusic() {
+            isMusicPlaying = false;
+            btnSound.textContent = "🔊 Music: Off";
+            if (musicInterval) {
+                clearInterval(musicInterval);
+                musicInterval = null;
+            }
+        }
+
+        btnSound.addEventListener('click', () => {
+            if (isMusicPlaying) {
+                stopBackgroundMusic();
+            } else {
+                startBackgroundMusic();
+            }
+        });
+
+        // Fullscreen Toggle
+        btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+                btnFullscreen.textContent = "⛶ Exit Fullscreen";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                btnFullscreen.textContent = "⛶ Fullscreen";
+            }
+        });
+
+        // Initialize Lanes and Racers
+        function initLanes() {
+            lanesContainer.innerHTML = '';
+            racersState = characters.map((char, index) => {
+                const laneElem = document.createElement('div');
+                laneElem.className = 'lane';
+                
+                const numElem = document.createElement('div');
+                numElem.className = 'lane-number';
+                numElem.textContent = index + 1;
+
+                const labelElem = document.createElement('div');
+                labelElem.className = 'lane-label';
+                labelElem.textContent = char.name; // Strictly lowercase vocabulary word
+
+                const racerElem = document.createElement('div');
+                racerElem.className = 'racer';
+                racerElem.style.transform = `translateX(0px)`;
+
+                const imgElem = document.createElement('img');
+                imgElem.src = char.file;
+                imgElem.alt = char.name;
+                imgElem.onerror = () => {
+                    imgElem.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><rect width="44" height="44" fill="%238a2be2"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23fff" font-size="12">' + char.name.substring(0,2) + '</text></svg>';
+                };
+
+                racerElem.appendChild(imgElem);
+                laneElem.appendChild(numElem);
+                laneElem.appendChild(labelElem);
+                laneElem.appendChild(racerElem);
+                lanesContainer.appendChild(laneElem);
+
+                return {
+                    name: char.name,
+                    file: char.file,
+                    element: racerElem,
+                    pos: 0,
+                    speed: 0
+                };
+            });
+        }
+
+        // Reset racer positions on screen
+        function resetRacers() {
+            racersState.forEach(racer => {
+                racer.pos = 0;
+                racer.element.style.transform = `translateX(0px)`;
+            });
+        }
+
+        // Start button handler
+        btnStart.addEventListener('click', () => {
+            if (isRacing) return;
+            initAudio();
+            startRaceSequence();
+        });
+
+        // Main Race Sequence
+        function startRaceSequence() {
+            isRacing = true;
+            btnStart.disabled = true;
+            statusDisplay.textContent = "Get ready!";
+            resetRacers();
+
+            // Select Winner adhering to No Back-to-Back Rule
+            let availableCandidates = characters.filter(c => c.name !== previousWinner);
+            let winningCharacter = availableCandidates[Math.floor(Math.random() * availableCandidates.length)];
+
+            // 3-Second Countdown Display
+            overlay.classList.add('active');
+            countdownDisplay.style.display = 'block';
+            winnerDisplay.style.display = 'none';
+
+            let count = 3;
+            countdownDisplay.textContent = count;
+            playTone(400, 0.2, 'square', 0.8);
+
+            const countInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownDisplay.textContent = count;
+                    playTone(400, 0.2, 'square', 0.8);
+                } else if (count === 0) {
+                    countdownDisplay.textContent = "GO!";
+                    playTone(800, 0.4, 'square', 1.0);
+                } else {
+                    clearInterval(countInterval);
+                    overlay.classList.remove('active');
+                    countdownDisplay.style.display = 'none';
+                    beginActualRace(winningCharacter);
+                }
+            }, 1000);
+        }
+
+        function beginActualRace(winner) {
+            statusDisplay.textContent = "Racing! Go go go!";
+            
+            // Calculate finish line distance in pixels dynamically based on track width
+            const trackWidth = lanesContainer.clientWidth;
+            const finishLineX = trackWidth - 145 - 80; // track width minus starting offset and finish offset
+
+            const raceDurationMs = 5000; // exactly 5 seconds race
+            const startTime = performance.now();
+
+            // Assign randomized movement parameters for all racers
+            racersState.forEach(racer => {
+                if (racer.name === winner.name) {
+                    racer.targetDist = finishLineX;
+                } else {
+                    // Other racers finish behind the winner (between 75% and 92% of finish line)
+                    racer.targetDist = finishLineX * (0.75 + Math.random() * 0.17);
+                }
+                // Add unique wobble frequency and amplitude factors
+                racer.wobbleFreq = 8 + Math.random() * 6;
+                racer.wobbleAmp = 4 + Math.random() * 6;
+            });
+
+            function animateRace(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / raceDurationMs, 1.0);
+
+                // Use easeOutCubic for smooth deceleration towards the end
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+                racersState.forEach(racer => {
+                    const currentDist = racer.targetDist * easeProgress;
+                    // Add slight vertical bobbing/wobble for lively animation
+                    const wobble = Math.sin((elapsed / 100) + racer.wobbleFreq) * racer.wobbleAmp * (1 - progress * 0.5);
+                    racer.element.style.transform = `translateX(${currentDist}px) translateY(${wobble}px)`;
+                });
+
+                if (progress < 1.0) {
+                    animationFrameId = requestAnimationFrame(animateRace);
+                } else {
+                    finishRace(winner);
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(animateRace);
+        }
+
+        function finishRace(winner) {
+            isRacing = false;
+            previousWinner = winner.name;
+            statusDisplay.textContent = `Winner: ${winner.name}!`;
+            playTone(600, 0.6, 'sine', 1.2);
+
+            // Show Winner Overlay Card
+            winnerImg.src = winner.file;
+            winnerImg.alt = winner.name;
+            winnerNameElem.textContent = winner.name; // Uppercase for final winner display as specified in EFL requirements
+
+            countdownDisplay.style.display = 'none';
+            winnerDisplay.style.display = 'flex';
+            overlay.classList.add('active');
+
+            startConfetti();
+        }
+
+        // Dismiss winner modal and reset for next round
+        btnDismiss.addEventListener('click', () => {
+            overlay.classList.remove('active');
+            stopConfetti();
+            resetRacers();
+            btnStart.disabled = false;
+            statusDisplay.textContent = "Ready for the next round!";
+        });
+
+        // Confetti Particle System
+        let confettiParticles = [];
+        let confettiAnimationId = null;
+
+        function startConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            confettiParticles = [];
+
+            const colors = ['#ff7518', '#8a2be2', '#ffd700', '#39ff14', '#ff3366', '#ffffff'];
+            for (let i = 0; i < 120; i++) {
+                confettiParticles.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 4 + 3,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 10
+                });
+            }
+
+            function updateConfetti() {
+                ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                confettiParticles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.rot += p.vRot;
+
+                    if (p.y > confettiCanvas.height) {
+                        p.y = -20;
+                        p.x = Math.random() * confettiCanvas.width;
+                    }
+
+                    ctxConfetti.save();
+                    ctxConfetti.translate(p.x, p.y);
+                    ctxConfetti.rotate((p.rot * Math.PI) / 180);
+                    ctxConfetti.fillStyle = p.color;
+                    ctxConfetti.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                    ctxConfetti.restore();
+                });
+                confettiAnimationId = requestAnimationFrame(updateConfetti);
+            }
+            updateConfetti();
+        }
+
+        function stopConfetti() {
+            if (confettiAnimationId) {
+                cancelAnimationFrame(confettiAnimationId);
+                confettiAnimationId = null;
+            }
+            ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        }
+
+        // Window resize handler for confetti canvas
+        window.addEventListener('resize', () => {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        });
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            initLanes();
+        });
+    </script>
+</body>
+</html>
